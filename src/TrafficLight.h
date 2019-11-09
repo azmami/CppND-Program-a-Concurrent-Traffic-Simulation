@@ -49,7 +49,7 @@ public:
 
     // getters / setters
     TrafficLightPhase getCurrentPhase();
-    void setCurrentPhase(TrafficLightPhase currentPhase) { _currentPhase = currentPhase; };
+    void setCurrentPhase(TrafficLightPhase currentPhase);
 
     // typical behaviour methods
     void waitForGreen();

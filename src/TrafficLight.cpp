@@ -28,7 +28,7 @@ void MessageQueue<T>::send(T &&msg)
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lck(_mutex);
-    _queue.clear(); // clear up queue so that it keeps the latest traffic light phase.
+    // _queue.clear(); // clear up queue so that it keeps the latest traffic light phase.
     _queue.push_back(std::move(msg));
     _condition.notify_one();
 }
@@ -61,6 +61,11 @@ TrafficLightPhase TrafficLight::getCurrentPhase()
     return _currentPhase;
 }
 
+void TrafficLight::setCurrentPhase(TrafficLightPhase currentPhase)
+{ 
+    _currentPhase = currentPhase; 
+}
+
 void TrafficLight::simulate()
 {
     // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
@@ -76,6 +81,8 @@ void TrafficLight::cycleThroughPhases()
     // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
     std::unique_lock<std::mutex> lck(_mutex);
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;
+    
+    srand(time(0)); // use current time as seed
     double cycleDurations = (6 - rand() % 3) * 1000; // this gives random int between 4000 and 6000 ms
 
     // init stop watch
@@ -104,6 +111,9 @@ void TrafficLight::cycleThroughPhases()
             
             // reset stop watch for next cycle
             lastUpdate = std::chrono::system_clock::now();
+            // assign random value between 3 and 6 seconds again
+            srand(time(0));
+            cycleDurations = (6 - rand() % 3) * 1000;
         }
         
     }
